@@ -14,7 +14,7 @@ import { verifyToken } from "../middlewares/verifyToken.js";
 
 const usersRoutes = Router();
 
-const upload = multer({ dest: "/var/lib/render/uploads/profiles" });
+const upload = multer({ dest: "/tmp/uploads/profiles" });
 
 usersRoutes.post("/signup", signup);
 usersRoutes.get("/buddyverify/:id", verifyBuddy);

@@ -45,12 +45,12 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   "/uploads/profiles",
-  express.static(path.join("/var/lib/render", "uploads/profiles"))
+  express.static(path.join("/tmp", "uploads/profiles"))
 );
 
 app.use(
   "/uploads/files",
-  express.static(path.join("/var/lib/render", "uploads/files"))
+  express.static(path.join("/tmp", "uploads/files"))
 );
 
 app.use(express.json());

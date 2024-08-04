@@ -18,7 +18,7 @@ import multer from "multer";
 export const chatRoutes = Router();
 export const groupChatRouter = Router();
 
-const upload = multer({ dest: "/var/lib/render/uploads/files" });
+const upload = multer({ dest: "/tmp/uploads/files" });
 
 chatRoutes.get("/:id", getBuddies);
 chatRoutes.post("/search/:id", searchBuddies);
