@@ -10,7 +10,6 @@ import { chatRoutes, groupChatRouter } from "./server/routes/ChatRoutes.js";
 import socketSetup from "./server/socket.js";
 
 import fs from 'fs';
-import path from 'path';
 
 const createDirectories = () => {
   const directories = [
