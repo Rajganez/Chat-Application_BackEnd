@@ -216,7 +216,7 @@ export const buddyDP = async (req, res) => {
       return res.status(404).json({ msg: "Error updating Image" });
     }
     const date = Date.now();
-    let fileName = "uploads/profiles/" + date + req.file.originalname;
+    let fileName = "/tmp/uploads/profiles/" + date + req.file.originalname;
     renameSync(req.file.path, fileName);
     const updatedUser = await userCollection.findOneAndUpdate(
       {
