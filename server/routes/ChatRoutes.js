@@ -35,7 +35,14 @@ chatRoutes.post("/search/:id", searchBuddies);
 chatRoutes.get("/fellow/:id", getFellowBuddy);
 chatRoutes.post("/directmessages", getSenderMsg);
 chatRoutes.post("/uploadfile", upload.single("file"), uploadFiles, (req, res) => {
-  res.send({ filepath: req.file.location });
+  try {
+    console.log(req.file);
+    const filePath = `/uploads/${req.file.filename}`;
+    res.status(200).send({ filepath: filePath });
+  } catch (error) {
+    console.error('Error handling file upload:', error);
+    res.status(500).send({ error: 'File upload failed' });
+  }
 });
 chatRoutes.post("/getchatcontacts", getChatContact);
 
