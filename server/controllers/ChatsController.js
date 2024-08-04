@@ -112,7 +112,7 @@ export const getSenderMsg = async (req, res) => {
 export const uploadFiles = async (req, res) => {
   try {
     const date = Date.now();
-    let fileDir = `/tmp/uploads/files/${date}`;
+    let fileDir = `tmp/uploads/files/${date}`;
     let filename = `${fileDir}/${req.file.originalname}`;
     mkdirSync(fileDir, { recursive: true });
     renameSync(req.file.path, filename);
