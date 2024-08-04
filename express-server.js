@@ -13,8 +13,8 @@ import fs from 'fs';
 
 const createDirectories = () => {
   const directories = [
-    "/var/lib/render/uploads/profiles",
-    "/var/lib/render/uploads/files"
+    "/tmp/uploads/profiles",
+    "/tmp/uploads/files"
   ];
 
   directories.forEach(dir => {
