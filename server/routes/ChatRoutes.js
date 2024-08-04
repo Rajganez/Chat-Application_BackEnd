@@ -18,7 +18,17 @@ import multer from "multer";
 export const chatRoutes = Router();
 export const groupChatRouter = Router();
 
-const upload = multer({ dest: "/tmp/uploads/files" });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join('/tmp/uploads');
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+const upload = multer({ storage: storage });
+// const upload = multer({ dest: "/tmp/uploads/files" });
 
 chatRoutes.get("/:id", getBuddies);
 chatRoutes.post("/search/:id", searchBuddies);
