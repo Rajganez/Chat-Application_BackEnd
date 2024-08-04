@@ -118,7 +118,7 @@ export const uploadFiles = async (req, res) => {
     renameSync(req.file.path, filename);
     return res
       .status(200)
-      .json({ filepath: filename, fileType: req.file.fieldname });
+      .json({ filepath: filename, fileType: req.file.filename });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ msg: "Internal Server Error" });
