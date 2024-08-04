@@ -2,6 +2,8 @@ import { ObjectId } from "mongodb";
 import { db } from "../DB/mongo-db.js";
 import { userCollection } from "./UsersController.js";
 import { mkdirSync, renameSync } from "fs";
+import fs from 'fs';
+import path from 'path';
 
 export const chatCollection = db.collection("Messages");
 export const groupChatCollection = db.collection("GroupMessages");
@@ -112,15 +114,15 @@ export const getSenderMsg = async (req, res) => {
 export const uploadFiles = async (req, res) => {
   try {
     const date = Date.now();
-    let fileDir = `/uploads/files/${date}`;
-    let filename = `${fileDir}/${req.file.originalname}`;
-    mkdirSync(fileDir, { recursive: true });
-    renameSync(req.file.path, filename);
-    return res
-      .status(200)
-      .json({ filepath: filename, fileType: req.file.filename });
+    const fileDir = path.join('/uploads/files', date.toString());
+    const filename = path.join(fileDir, req.file.originalname);
+
+    fs.mkdirSync(path.join('/tmp', fileDir), { recursive: true });
+    fs.renameSync(req.file.path, path.join('/tmp', filename));
+
+    return res.status(200).json({ filepath: filename, fileType: req.file.mimetype });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).send({ msg: "Internal Server Error" });
   }
 };

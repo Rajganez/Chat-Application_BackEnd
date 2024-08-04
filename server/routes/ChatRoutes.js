@@ -25,7 +25,7 @@ chatRoutes.post("/search/:id", searchBuddies);
 chatRoutes.get("/fellow/:id", getFellowBuddy);
 chatRoutes.post("/directmessages", getSenderMsg);
 chatRoutes.post("/uploadfile", upload.single("file"), uploadFiles, (req, res) => {
-  res.send({ filepath: req.file.location });
+  res.send({ filepath: req.file.path });
 });
 chatRoutes.post("/getchatcontacts", getChatContact);
 

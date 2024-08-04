@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { ObjectId } from "mongodb";
 import { renameSync, unlinkSync } from "fs";
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -216,19 +218,18 @@ export const buddyDP = async (req, res) => {
       return res.status(404).json({ msg: "Error updating Image" });
     }
     const date = Date.now();
-    let fileName = "/uploads/profiles/" + date + req.file.originalname;
-    renameSync(req.file.path, fileName);
+    const fileName = path.join('/uploads/profiles', `${date}-${req.file.originalname}`);
+
+    fs.renameSync(req.file.path, path.join('/tmp', fileName));
+
     const updatedUser = await userCollection.findOneAndUpdate(
-      {
-        _id: objectId,
-      },
+      { _id: objectId },
       { $set: { image: fileName } }
     );
-    return res
-      .status(200)
-      .json({ userImage: updatedUser.image, filename: fileName });
+
+    return res.status(200).json({ userImage: updatedUser.image, filename: fileName });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     if (!res.headersSent) {
       return res.status(500).send({ error: error.message });
     }

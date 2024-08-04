@@ -25,7 +25,7 @@ usersRoutes.post(
   upload.single("profile-image"),
   buddyDP,
   (req, res) => {
-    res.send({ filename: req.file.location });
+    res.send({ filename: req.file.path });
   }
 );
 usersRoutes.delete("/profile/:id/removedp", removeBuddyDP);

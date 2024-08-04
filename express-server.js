@@ -8,8 +8,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { chatRoutes, groupChatRouter } from "./server/routes/ChatRoutes.js";
 import socketSetup from "./server/socket.js";
-
 import fs from 'fs';
+
+dotenv.config();
 
 const createDirectories = () => {
   const directories = [
@@ -26,8 +27,6 @@ const createDirectories = () => {
 
 // Call the function to create directories
 createDirectories();
-
-dotenv.config();
 
 const app = express();
 await connectToDB();
