@@ -18,13 +18,13 @@ import multer from "multer";
 export const chatRoutes = Router();
 export const groupChatRouter = Router();
 
-const upload = multer({ dest: "/uploads/files" });
+const upload = multer({ dest: "/var/lib/render/uploads/files" });
 
 chatRoutes.get("/:id", getBuddies);
 chatRoutes.post("/search/:id", searchBuddies);
 chatRoutes.get("/fellow/:id", getFellowBuddy);
 chatRoutes.post("/directmessages", getSenderMsg);
-chatRoutes.post("/uploadfile", upload.single("file"), uploadFiles, (req,res) => {
+chatRoutes.post("/uploadfile", upload.single("file"), uploadFiles, (req, res) => {
   res.send({ filepath: req.file.location });
 });
 chatRoutes.post("/getchatcontacts", getChatContact);

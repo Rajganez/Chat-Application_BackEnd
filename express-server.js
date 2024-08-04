@@ -9,6 +9,25 @@ import { fileURLToPath } from "url";
 import { chatRoutes, groupChatRouter } from "./server/routes/ChatRoutes.js";
 import socketSetup from "./server/socket.js";
 
+import fs from 'fs';
+import path from 'path';
+
+const createDirectories = () => {
+  const directories = [
+    "/var/lib/render/uploads/profiles",
+    "/var/lib/render/uploads/files"
+  ];
+
+  directories.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  });
+};
+
+// Call the function to create directories
+createDirectories();
+
 dotenv.config();
 
 const app = express();
@@ -27,12 +46,12 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   "/uploads/profiles",
-  express.static(path.join(__dirname, "/uploads/profiles"))
+  express.static(path.join("/var/lib/render", "uploads/profiles"))
 );
 
 app.use(
   "/uploads/files",
-  express.static(path.join(__dirname, "/uploads/files"))
+  express.static(path.join("/var/lib/render", "uploads/files"))
 );
 
 app.use(express.json());

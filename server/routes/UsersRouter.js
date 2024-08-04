@@ -14,7 +14,7 @@ import { verifyToken } from "../middlewares/verifyToken.js";
 
 const usersRoutes = Router();
 
-const upload = multer({ dest: "uploads/profiles/" });
+const upload = multer({ dest: "/var/lib/render/uploads/profiles" });
 
 usersRoutes.post("/signup", signup);
 usersRoutes.get("/buddyverify/:id", verifyBuddy);
@@ -23,7 +23,8 @@ usersRoutes.post("/profile/:id", buddyProfile);
 usersRoutes.post(
   "/profile/:id/uploaddp",
   upload.single("profile-image"),
-  buddyDP, (req,res) => {
+  buddyDP,
+  (req, res) => {
     res.send({ filename: req.file.location });
   }
 );
