@@ -44,12 +44,12 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   "/uploads/profiles",
-  express.static(path.join("/tmp", "uploads/profiles"))
+  express.static(path.join("/tmp", "uploads","profiles"))
 );
 
 app.use(
   "/uploads/files",
-  express.static(path.join("/tmp", "uploads/files"))
+  express.static(path.join("/tmp", "uploads","profiles"))
 );
 
 app.use(express.json());
