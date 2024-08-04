@@ -23,7 +23,9 @@ usersRoutes.post("/profile/:id", buddyProfile);
 usersRoutes.post(
   "/profile/:id/uploaddp",
   upload.single("profile-image"),
-  buddyDP
+  buddyDP, (req,res) => {
+    res.send({ filename: req.file.location });
+  }
 );
 usersRoutes.delete("/profile/:id/removedp", removeBuddyDP);
 usersRoutes.get("/profile/:id/sendmail", verifyMail);
