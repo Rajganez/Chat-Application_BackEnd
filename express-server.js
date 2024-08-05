@@ -49,7 +49,7 @@ app.use(
 
 app.use(
   "/uploads/files",
-  express.static(path.join("/tmp", "uploads","profiles"))
+  express.static(path.join("/tmp", "uploads","files"))
 );
 
 app.use(express.json());
