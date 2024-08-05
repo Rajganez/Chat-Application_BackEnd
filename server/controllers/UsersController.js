@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { ObjectId } from "mongodb";
 import { renameSync, unlinkSync } from "fs";
+import { promises as fsPromises } from "fs";
 import fs from "fs";
 import path from "path";
 
@@ -213,7 +214,7 @@ export const verifyMail = async (req, res) => {
 export const buddyDP = async (req, res) => {
   const { id } = req.params;
   try {
-    console.log(req.file)
+    console.log(req.file);
     const objectId = ObjectId.createFromHexString(id);
     if (!req.file) {
       return res.status(404).json({ msg: "Error updating Image" });
