@@ -68,12 +68,25 @@ npm start
 
 Here are the main API endpoints
 
-User Routes: 
+User Routes: (`/user`)
 
-`POST /buddy/signup` : Register a user
+- `POST /buddy/signup` : Register a user
 
-`POST /buddy/login` : Login a user
+- `POST /buddy/login` : Login a user
 
-Chat Routes: 
+- `POST /buddy/logout` : Logout for the user   
+
+Chat Routes: (`/chat`)
+
+- `GET /search/:id` : Search contacts of the fellow buddies
+
+- `POST /getchatcontacts` : get chat details of the logged buddy
+
+Group Routes: (`/group`)
+
+- `GET /:groupid` : Get the Group from the DB
+
+- `POST /addrecipient` : Add the logged buddy to the group 
+
 
 

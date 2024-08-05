@@ -5,8 +5,8 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { ObjectId } from "mongodb";
 import { renameSync, unlinkSync } from "fs";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 dotenv.config();
 
@@ -218,16 +218,21 @@ export const buddyDP = async (req, res) => {
       return res.status(404).json({ msg: "Error updating Image" });
     }
     const date = Date.now();
-    const fileName = path.join('uploads/profiles', `${date}-${req.file.originalname}`);
+    const fileName = path.join(
+      "uploads/profiles",
+      `${date}-${req.file.originalname}`
+    );
 
-    fs.renameSync(req.file.path, path.join('/tmp', fileName));
+    fs.renameSync(req.file.path, path.join("/tmp", fileName));
 
     const updatedUser = await userCollection.findOneAndUpdate(
       { _id: objectId },
       { $set: { image: fileName } }
     );
 
-    return res.status(200).json({ userImage: updatedUser.image, filename: fileName });
+    return res
+      .status(200)
+      .json({ userImage: updatedUser.image, filename: fileName });
   } catch (error) {
     console.error(error);
     if (!res.headersSent) {
@@ -243,22 +248,31 @@ export const removeBuddyDP = async (req, res) => {
   try {
     const objectId = ObjectId.createFromHexString(id);
     const user = await userCollection.findOne({ _id: objectId });
+
     if (user.image !== null) {
-      unlinkSync(user.image);
-      const updatedUser = await userCollection.findOneAndUpdate(
-        {
-          _id: objectId,
-        },
-        { $set: { image: null } }
-      );
-      return res.status(200).json({ userImage: updatedUser.image });
+      const imagePath = path.resolve(user.image);
+
+      try {
+        await fsPromises.unlink(imagePath);
+        const updatedUser = await userCollection.findOneAndUpdate(
+          { _id: objectId },
+          { $set: { image: null } },
+          { returnDocument: "after" } // Ensure the updated document is returned
+        );
+
+        return res.status(200).json({ userImage: updatedUser.value.image });
+      } catch (unlinkError) {
+        console.error("Error deleting file:", unlinkError);
+        return res
+          .status(500)
+          .send({ msg: "Error deleting file", error: unlinkError.message });
+      }
     }
-    return res.status(400).send({ msg: "Server Error" });
+
+    return res.status(400).send({ msg: "No image to delete" });
   } catch (error) {
-    console.log(error);
-    if (!res.headersSent) {
-      return res.status(500).send({ error: error.message });
-    }
+    console.error("Error:", error);
+    return res.status(500).send({ error: error.message });
   }
 };
 

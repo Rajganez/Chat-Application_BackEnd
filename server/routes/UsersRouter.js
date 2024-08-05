@@ -16,10 +16,10 @@ const usersRoutes = Router();
 
 const upload = multer({ dest: "/tmp/uploads/profiles" });
 
-usersRoutes.post("/signup",verifyToken, signup);
-usersRoutes.get("/buddyverify/:id", verifyBuddy);
-usersRoutes.post("/login",verifyToken, loginBuddy);
-usersRoutes.post("/profile/:id",verifyToken, buddyProfile);
+usersRoutes.post("/signup", verifyToken, signup);
+usersRoutes.get("/buddyverify/:id", verifyToken, verifyBuddy);
+usersRoutes.post("/login", verifyToken, loginBuddy);
+usersRoutes.post("/profile/:id", verifyToken, buddyProfile);
 usersRoutes.post(
   "/profile/:id/uploaddp",
   upload.single("profile-image"),
