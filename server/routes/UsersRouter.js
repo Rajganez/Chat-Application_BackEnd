@@ -30,6 +30,6 @@ usersRoutes.post(
 );
 usersRoutes.delete("/profile/:id/removedp", removeBuddyDP);
 usersRoutes.get("/profile/:id/sendmail", verifyMail);
-usersRoutes.post("/logout",verifyToken, logOut);
+usersRoutes.post("/logout", logOut);
 
 export default usersRoutes;
