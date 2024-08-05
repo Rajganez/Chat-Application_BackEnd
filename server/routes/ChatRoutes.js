@@ -20,17 +20,17 @@ export const groupChatRouter = Router();
 
 const upload = multer({ dest: "/tmp/uploads/files" });
 
-chatRoutes.get("/:id", getBuddies);
-chatRoutes.post("/search/:id", searchBuddies);
-chatRoutes.get("/fellow/:id", getFellowBuddy);
-chatRoutes.post("/directmessages", getSenderMsg);
+chatRoutes.get("/:id",verifyToken, getBuddies);
+chatRoutes.post("/search/:id",verifyToken, searchBuddies);
+chatRoutes.get("/fellow/:id",verifyToken, getFellowBuddy);
+chatRoutes.post("/directmessages",verifyToken, getSenderMsg);
 chatRoutes.post("/uploadfile", upload.single("file"), uploadFiles, (req, res) => {
   res.send({ filepath: req.file.path });
 });
-chatRoutes.post("/getchatcontacts", getChatContact);
+chatRoutes.post("/getchatcontacts",verifyToken, getChatContact);
 
-groupChatRouter.get("/", getGroups);
-groupChatRouter.get("/:groupid", getSelectedGroup);
+groupChatRouter.get("/",verifyToken, getGroups);
+groupChatRouter.get("/:groupid",verifyToken, getSelectedGroup);
 groupChatRouter.post("/addrecipient", addRecipientGroup);
 groupChatRouter.post("/getgroupchat", getGroupChats);
 groupChatRouter.post("/exitgroup", exitGroupChat);
