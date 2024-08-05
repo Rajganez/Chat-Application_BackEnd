@@ -24,7 +24,6 @@ usersRoutes.post(
   "/profile/:id/uploaddp",
   upload.single("file"),
   buddyDP,
-  verifyToken,
   (req, res) => {
     res.send({ filename: req.file.path });
   }
