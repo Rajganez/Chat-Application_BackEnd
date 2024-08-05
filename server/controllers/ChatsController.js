@@ -114,7 +114,7 @@ export const getSenderMsg = async (req, res) => {
 export const uploadFiles = async (req, res) => {
   try {
     const date = Date.now();
-    const fileDir = path.join('/uploads/files', date.toString());
+    const fileDir = path.join('uploads/files', date.toString());
     const filename = path.join(fileDir, req.file.originalname);
 
     fs.mkdirSync(path.join('/tmp', fileDir), { recursive: true });

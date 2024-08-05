@@ -218,7 +218,7 @@ export const buddyDP = async (req, res) => {
       return res.status(404).json({ msg: "Error updating Image" });
     }
     const date = Date.now();
-    const fileName = path.join('/uploads/profiles', `${date}-${req.file.originalname}`);
+    const fileName = path.join('uploads/profiles', `${date}-${req.file.originalname}`);
 
     fs.renameSync(req.file.path, path.join('/tmp', fileName));
 
