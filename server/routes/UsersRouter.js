@@ -22,7 +22,7 @@ usersRoutes.post("/login", verifyToken, loginBuddy);
 usersRoutes.post("/profile/:id", verifyToken, buddyProfile);
 usersRoutes.post(
   "/profile/:id/uploaddp",
-  upload.single("profile-image"),
+  upload.single("file"),
   buddyDP,
   (req, res) => {
     res.send({ filename: req.file.path });
