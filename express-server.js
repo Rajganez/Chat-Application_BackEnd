@@ -47,27 +47,29 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   "/uploads/profiles",
-  express.static(path.join("/tmp", "uploads", "profiles"), {
-    setHeaders: (res, path) => {
-      res.setHeader("Cache-Control", "public, max-age=31536000");
-    },
-  })
+  express.static(path.join("/tmp", "uploads", "profiles"))
+  // , {
+  //   setHeaders: (res, path) => {
+  //     res.setHeader("Cache-Control", "public, max-age=31536000");
+  //   },
+  // })
 );
 
 app.use(
   "/uploads/files",
-  express.static(path.join("/tmp", "uploads", "files"), {
-    setHeaders: (res, path) => {
-      res.setHeader("Cache-Control", "public, max-age=31536000");
-    },
-  })
+  express.static(path.join("/tmp", "uploads", "files"))
+  // , {
+  //   setHeaders: (res, path) => {
+  //     res.setHeader("Cache-Control", "public, max-age=31536000");
+  //   },
+  // })
 );
 
 // Middleware to set cache-control headers for other routes
-app.use((req, res, next) => {
-  res.setHeader("Cache-Control", "no-store");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Cache-Control", "no-store");
+//   next();
+// });
 
 app.use(express.json());
 
