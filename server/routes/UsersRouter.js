@@ -10,16 +10,16 @@ import {
   verifyMail,
 } from "../controllers/UsersController.js";
 import multer from "multer";
-import { verifyToken } from "../middlewares/verifyToken.js";
+// import { verifyToken } from "../middlewares/verifyToken.js";
 
 const usersRoutes = Router();
 
 const upload = multer({ dest: "/tmp/uploads/profiles" });
 
-usersRoutes.post("/signup", verifyToken, signup);
-usersRoutes.get("/buddyverify/:id", verifyToken, verifyBuddy);
-usersRoutes.post("/login", verifyToken, loginBuddy);
-usersRoutes.post("/profile/:id", verifyToken, buddyProfile);
+usersRoutes.post("/signup", signup);
+usersRoutes.get("/buddyverify/:id", verifyBuddy);
+usersRoutes.post("/login", loginBuddy);
+usersRoutes.post("/profile/:id", buddyProfile);
 usersRoutes.post(
   "/profile/:id/uploaddp",
   upload.single("file"),
