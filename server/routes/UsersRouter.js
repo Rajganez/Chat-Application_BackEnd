@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   buddyDP,
   buddyProfile,
+  forgotPassword,
   loginBuddy,
   logOut,
   removeBuddyDP,
@@ -29,6 +30,8 @@ usersRoutes.post(
   }
 );
 usersRoutes.delete("/profile/:id/removedp", removeBuddyDP);
+usersRoutes.post("/forgotpassword", forgotPassword);
+usersRoutes.post("/resetpassword/:id", resetPassword);
 usersRoutes.get("/profile/:id/sendmail", verifyMail);
 usersRoutes.post("/logout", logOut);
 

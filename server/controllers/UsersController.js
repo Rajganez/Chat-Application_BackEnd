@@ -297,21 +297,20 @@ export const logOut = async (req, res) => {
 //--------------Forgot Password Function--------------//
 
 export const forgotPassword = async (req, res) => {
-  const { buddyId } = req.body;
+  const { forgotEmail } = req.body;
   try {
-    const objectId = ObjectId.createFromHexString(buddyId);
-    const token = jwt.sign({ Userid: objectId }, process.env.JWT_KEY, {
+    const token = jwt.sign({ email: forgotEmail }, process.env.JWT_KEY, {
       expiresIn: "15m",
     });
     const findBuddy = await userCollection.findOneAndUpdate(
-      { _id: objectId },
+      { signUpEmail: forgotEmail },
       { $set: { resetToken: token } }
     );
     if (findBuddy) {
-      const verifyLink = `${process.env.ORIGIN}/resetpassword`;
+      const verifyLink = `${process.env.ORIGIN}/resetpassword/${findBuddy._id}`;
       await transporter.sendMail({
         ...mailOptions,
-        to: [findBuddy.signUpEmail],
+        to: [forgotEmail],
         subject: "Hibuddy your Password Reset link",
         html: `Hi! Buddy Your Password Reset link Expires in 15 minutes:<br/><br/>
         <a href=${verifyLink}>${verifyLink}</a>`,
@@ -322,37 +321,43 @@ export const forgotPassword = async (req, res) => {
     } else {
       return res.status(404).json({ msg: "User Not Found" });
     }
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
 };
 
 //--------------Password Reset Function--------------//
 
 export const resetPassword = async (req, res) => {
-  const id = req.param;
+  const id = req.params;
   try {
     const objectId = ObjectId.createFromHexString(id);
     const findBuddy = await userCollection.findOne({ _id: objectId });
     if (findBuddy) {
-      jwt.verify(userToken, process.env.JWT_KEY, async (err, decoded) => {
-        if (err) {
-          if (err.name === "TokenExpiredError") {
-            return res.status(401).send({ error: "Token Expired" });
-          }
-        } else {
-          const newPassword = req.body.newPassword;
-          const hashedPassword = await bcrypt.hash(newPassword, 10);
-          await userCollection.findOneAndUpdate(
-            { _id: objectId },
-            {
-              $set: {
-                signUpPassword: hashedPassword,
-                confirmSignUpPassword: hashedPassword,
-              },
+      jwt.verify(
+        findBuddy.resetToken,
+        process.env.JWT_KEY,
+        async (err, decoded) => {
+          if (err) {
+            if (err.name === "TokenExpiredError") {
+              return res.status(401).send({ error: "Token Expired" });
             }
-          );
-          return res.status(200).json({ msg: "Password Reset Successfully" });
+          } else {
+            const newPassword = req.body.newPassword;
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            await userCollection.findOneAndUpdate(
+              { _id: objectId },
+              {
+                $set: {
+                  signUpPassword: hashedPassword,
+                  confirmSignUpPassword: hashedPassword,
+                },
+              }
+            );
+            return res.status(200).json({ msg: "Password Reset Successfully" });
+          }
         }
-      });
+      );
     }
   } catch (error) {
     return res.status(500).send({ msg: "Error: " + error.message });
