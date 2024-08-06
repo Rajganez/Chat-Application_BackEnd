@@ -5,6 +5,7 @@ dotenv.config();
 
 export const verifyToken = async (req, res, next) => {
   const token = req.cookies.jwt;
+  console.log(req.Id)
   if (!token) {
     return res.status(403).send({ msg: "Not authorized" });
   }
