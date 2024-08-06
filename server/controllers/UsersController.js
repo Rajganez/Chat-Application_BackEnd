@@ -249,10 +249,12 @@ export const removeBuddyDP = async (req, res) => {
   try {
     const objectId = ObjectId.createFromHexString(id);
     const user = await userCollection.findOne({ _id: objectId });
-
+    const encodedFilePath = user.image
+      .split("/")
+      .map((segment) => encodeURIComponent(segment))
+      .join("/");
     if (user.image !== null) {
-      const imagePath = path.resolve("/tmp", user.image);
-
+      const imagePath = path.resolve("/tmp", encodedFilePath);
       try {
         await fsPromises.unlink(imagePath);
         const updatedUser = await userCollection.findOneAndUpdate(
