@@ -8,18 +8,15 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { chatRoutes, groupChatRouter } from "./server/routes/ChatRoutes.js";
 import socketSetup from "./server/socket.js";
-import fs from 'fs';
-import helmet from "helmet";
+import fs from "fs";
+// import helmet from "helmet";
 
 dotenv.config();
 
 const createDirectories = () => {
-  const directories = [
-    "/tmp/uploads/profiles",
-    "/tmp/uploads/files"
-  ];
+  const directories = ["/tmp/uploads/profiles", "/tmp/uploads/files"];
 
-  directories.forEach(dir => {
+  directories.forEach((dir) => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
@@ -33,8 +30,8 @@ const app = express();
 await connectToDB();
 
 //Helmet set security-related HTTP headers without this is not working in Edge browser
-app.use(helmet());
-app.use(helmet.noSniff());
+// app.use(helmet());
+// app.use(helmet.noSniff());
 
 app.use(cookieParser());
 app.use(
@@ -50,27 +47,15 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   "/uploads/profiles",
-  express.static(path.join("/tmp", "uploads", "profiles"), {
-    setHeaders: (res, path) => {
-      res.setHeader("Cache-Control", "public, max-age=31536000");
-    }
-  })
+  express.static(path.join("/tmp", "uploads", "profiles"))
 );
 
 app.use(
   "/uploads/files",
-  express.static(path.join("/tmp", "uploads", "files"), {
-    setHeaders: (res, path) => {
-      res.setHeader("Cache-Control", "public, max-age=31536000");
-    }
-  })
+  express.static(path.join("/tmp", "uploads", "files"))
 );
 
 // Middleware to set cache-control headers for other routes
-app.use((req, res, next) => {
-  res.setHeader("Cache-Control", "no-store");
-  next();
-});
 
 app.use(express.json());
 

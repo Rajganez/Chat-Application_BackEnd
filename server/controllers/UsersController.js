@@ -63,6 +63,8 @@ export const signup = async (req, res) => {
       });
       res.cookie("jwt", createToken(userData.signUpEmail, userData._id), {
         maxAge,
+        httpOnly: true,
+        secure: true,
         sameSite: "None",
       });
 
@@ -116,6 +118,8 @@ export const loginBuddy = async (req, res) => {
     if (result) {
       res.cookie("jwt", createToken(user.signUpEmail, user._id), {
         maxAge,
+        httpOnly: true,
+        secure: true,
         sameSite: "None",
       });
       return res.status(200).json({
@@ -278,7 +282,7 @@ export const removeBuddyDP = async (req, res) => {
 export const logOut = async (req, res) => {
   try {
     res.clearCookie("jwt", {
-      secure: "production",
+      secure: true,
       sameSite: "None",
     });
     return res.status(200).send({ msg: "Buddy Logged Out Successfully" });
