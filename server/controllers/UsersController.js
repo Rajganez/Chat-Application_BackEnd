@@ -116,8 +116,7 @@ export const loginBuddy = async (req, res) => {
     }
     const result = await bcrypt.compare(pass, user.signUpPassword);
     if (result) {
-      const token = createToken(user.signUpEmail, user._id);
-      res.cookie("jwt", token, {
+      res.cookie("jwt", createToken(user.signUpEmail, user._id), {
         maxAge,
         httpOnly: true,
         secure: true,
@@ -356,6 +355,6 @@ export const resetPassword = async (req, res) => {
       });
     }
   } catch (error) {
-    return res.status(500).send({msg: "Error: " + error.message});
+    return res.status(500).send({ msg: "Error: " + error.message });
   }
 };
