@@ -329,7 +329,7 @@ export const forgotPassword = async (req, res) => {
 //--------------Password Reset Function--------------//
 
 export const resetPassword = async (req, res) => {
-  const id = req.params;
+  const { id } = req.params;
   try {
     const objectId = ObjectId.createFromHexString(id);
     const findBuddy = await userCollection.findOne({ _id: objectId });
