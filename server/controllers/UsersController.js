@@ -63,8 +63,6 @@ export const signup = async (req, res) => {
       });
       res.cookie("jwt", createToken(userData.signUpEmail, userData._id), {
         maxAge,
-        httpOnly: true,
-        secure: "production",
         sameSite: "None",
       });
 
@@ -118,8 +116,6 @@ export const loginBuddy = async (req, res) => {
     if (result) {
       res.cookie("jwt", createToken(user.signUpEmail, user._id), {
         maxAge,
-        httpOnly: true,
-        secure: "production",
         sameSite: "None",
       });
       return res.status(200).json({
