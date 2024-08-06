@@ -6,6 +6,7 @@ import {
   loginBuddy,
   logOut,
   removeBuddyDP,
+  resetPassword,
   signup,
   verifyBuddy,
   verifyMail,
