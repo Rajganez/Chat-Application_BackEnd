@@ -30,8 +30,8 @@ const app = express();
 await connectToDB();
 
 //Helmet set security-related HTTP headers without this is not working in Edge browser
-app.use(helmet());
-app.use(helmet.noSniff());
+// app.use(helmet());
+// app.use(helmet.noSniff());
 
 app.use(cookieParser());
 app.use(
