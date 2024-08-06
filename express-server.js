@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 import { chatRoutes, groupChatRouter } from "./server/routes/ChatRoutes.js";
 import socketSetup from "./server/socket.js";
 import fs from "fs";
-// import helmet from "helmet";
+import helmet from "helmet";
 
 dotenv.config();
 
@@ -30,8 +30,8 @@ const app = express();
 await connectToDB();
 
 //Helmet set security-related HTTP headers without this is not working in Edge browser
-// app.use(helmet());
-// app.use(helmet.noSniff());
+app.use(helmet());
+app.use(helmet.noSniff());
 
 app.use(cookieParser());
 app.use(
@@ -47,15 +47,27 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   "/uploads/profiles",
-  express.static(path.join("/tmp", "uploads", "profiles"))
+  express.static(path.join("/tmp", "uploads", "profiles"), {
+    setHeaders: (res, path) => {
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+    },
+  })
 );
 
 app.use(
   "/uploads/files",
-  express.static(path.join("/tmp", "uploads", "files"))
+  express.static(path.join("/tmp", "uploads", "files"), {
+    setHeaders: (res, path) => {
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+    },
+  })
 );
 
 // Middleware to set cache-control headers for other routes
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
 
 app.use(express.json());
 
