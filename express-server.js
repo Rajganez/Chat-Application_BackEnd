@@ -9,6 +9,7 @@ import { fileURLToPath } from "url";
 import { chatRoutes, groupChatRouter } from "./server/routes/ChatRoutes.js";
 import socketSetup from "./server/socket.js";
 import fs from 'fs';
+import helmet from "helmet";
 
 dotenv.config();
 
@@ -30,6 +31,11 @@ createDirectories();
 
 const app = express();
 await connectToDB();
+
+//Helmet set security-related HTTP headers without this is not working in Edge browser
+app.use(helmet());
+app.use(helmet.noSniff());
+
 app.use(cookieParser());
 app.use(
   cors({
