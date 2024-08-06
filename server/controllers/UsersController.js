@@ -252,7 +252,7 @@ export const removeBuddyDP = async (req, res) => {
     const user = await userCollection.findOne({ _id: objectId });
 
     if (user.image !== null) {
-      const imagePath = path.resolve(user.image);
+      const imagePath = path.resolve("/tmp", user.image);
 
       try {
         await fsPromises.unlink(imagePath);
@@ -292,5 +292,70 @@ export const logOut = async (req, res) => {
     if (!res.headersSent) {
       return res.status(500).send({ error: error.message });
     }
+  }
+};
+
+//--------------Forgot Password Function--------------//
+
+export const forgotPassword = async (req, res) => {
+  const { buddyId } = req.body;
+  try {
+    const objectId = ObjectId.createFromHexString(buddyId);
+    const token = jwt.sign({ Userid: objectId }, process.env.JWT_KEY, {
+      expiresIn: "15m",
+    });
+    const findBuddy = await userCollection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { resetToken: token } }
+    );
+    if (findBuddy) {
+      const verifyLink = `${process.env.ORIGIN}/resetpassword`;
+      await transporter.sendMail({
+        ...mailOptions,
+        to: [findBuddy.signUpEmail],
+        subject: "Hibuddy your Password Reset link",
+        html: `Hi! Buddy Your Password Reset link Expires in 15 minutes:<br/><br/>
+        <a href=${verifyLink}>${verifyLink}</a>`,
+      });
+      return res
+        .status(200)
+        .json({ msg: "Reset Password Link Sent Successfully" });
+    } else {
+      return res.status(404).json({ msg: "User Not Found" });
+    }
+  } catch (error) {}
+};
+
+//--------------Password Reset Function--------------//
+
+export const resetPassword = async (req, res) => {
+  const id = req.param;
+  try {
+    const objectId = ObjectId.createFromHexString(id);
+    const findBuddy = await userCollection.findOne({ _id: objectId });
+    if (findBuddy) {
+      jwt.verify(userToken, process.env.JWT_KEY, async (err, decoded) => {
+        if (err) {
+          if (err.name === "TokenExpiredError") {
+            return res.status(401).send({ error: "Token Expired" });
+          }
+        } else {
+          const newPassword = req.body.newPassword;
+          const hashedPassword = await bcrypt.hash(newPassword, 10);
+          await userCollection.findOneAndUpdate(
+            { _id: objectId },
+            {
+              $set: {
+                signUpPassword: hashedPassword,
+                confirmSignUpPassword: hashedPassword,
+              },
+            }
+          );
+          return res.status(200).json({ msg: "Password Reset Successfully" });
+        }
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({msg: "Error: " + error.message});
   }
 };
