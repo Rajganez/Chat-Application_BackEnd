@@ -34,10 +34,10 @@ chatRoutes.post(
   }
 );
 chatRoutes.post("/getchatcontacts", getChatContact);
+chatRoutes.post("/getbuddies", getBuddyChatContacts);
 
 groupChatRouter.get("/", getGroups);
 groupChatRouter.get("/:groupid", getSelectedGroup);
 groupChatRouter.post("/addrecipient", addRecipientGroup);
 groupChatRouter.post("/getgroupchat", getGroupChats);
-groupChatRouter.post("/getbuddies", getBuddyChatContacts);
 groupChatRouter.post("/exitgroup", exitGroupChat);
