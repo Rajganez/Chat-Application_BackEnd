@@ -260,9 +260,11 @@ export const getBuddyChatContacts = async (req, res) => {
     const objectId = ObjectId.createFromHexString(id);
     const buddyContacts = await userCollection.findOne({ _id: objectId });
     return res.status(200).json({
-      id: buddyContacts._id,
-      nick: buddyContacts.nickName,
-      img: buddyContacts.image,
+      [id]: {
+        id: buddyContacts._id,
+        nick: buddyContacts.nickName,
+        img: buddyContacts.image,
+      },
     });
   } catch (error) {
     console.log(error);
