@@ -3,6 +3,7 @@ import {
   chatCollection,
   groupChatCollection,
 } from "./controllers/ChatsController.js";
+import { userCollection } from "./controllers/UsersController.js";
 
 const socketSetup = (server) => {
   const io = new Server(server, {
@@ -44,8 +45,7 @@ const socketSetup = (server) => {
     if (recipientId) {
       io.to(recipientId).emit("receiveMessage", message);
       io.to(recipientId).emit("notification", {
-        title: "New Message",
-        body: `You have a new message from ${message.sender}`,
+        senderID: `${message.sender}`,
       });
     }
     if (senderId) {
@@ -71,8 +71,8 @@ const socketSetup = (server) => {
           io.to(socketIds).emit("receiveGroupMessage", message);
         }
         io.to(socketIds).emit("notification", {
-          title: "New Group Message",
-          body: `You have a new message in group ${groupID} from ${message.sender}`,
+          groupid: `${groupID}`,
+          messageFrom: `${message.sender}`,
         });
       }
       io.to(senderId).emit("receiveGroupMessage", message);
