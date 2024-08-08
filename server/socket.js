@@ -15,6 +15,11 @@ const socketSetup = (server) => {
 
   const socketMap = new Map();
 
+  const emitLoggedUsers = () => {
+    const loggedUsers = Array.from(socketMap.keys());
+    io.emit("loggedUsers", loggedUsers);
+  };
+
   const disconnect = (socket) => {
     console.log("disconnected', socket: " + socket.id);
     for (const [userId, socketid] of socketMap.entries()) {
@@ -23,6 +28,7 @@ const socketSetup = (server) => {
         break;
       }
     }
+    emitLoggedUsers();
   };
   const sendMsg = async (message) => {
     const senderId = socketMap.get(message.sender);
@@ -32,10 +38,15 @@ const socketSetup = (server) => {
       recipientId: message.recipient,
       timestamp: Date.now(),
       content: message.content,
+      messageType: message.messageType,
     });
 
     if (recipientId) {
       io.to(recipientId).emit("receiveMessage", message);
+      io.to(recipientId).emit("notification", {
+        title: "New Message",
+        body: `You have a new message from ${message.sender}`,
+      });
     }
     if (senderId) {
       io.to(senderId).emit("receiveMessage", message);
@@ -51,7 +62,7 @@ const socketSetup = (server) => {
       { $push: { groupContent: { [sender]: message.content } } },
       { returnDocument: "after" }
     );
-    if(createGroupChats){
+    if (createGroupChats) {
       const memberIds = createGroupChats.members;
       const senderId = socketMap.get(message.sender);
       for (const ids of memberIds) {
@@ -59,6 +70,10 @@ const socketSetup = (server) => {
         if (socketIds) {
           io.to(socketIds).emit("receiveGroupMessage", message);
         }
+        io.to(socketIds).emit("notification", {
+          title: "New Group Message",
+          body: `You have a new message in group ${groupID} from ${message.sender}`,
+        });
       }
       io.to(senderId).emit("receiveGroupMessage", message);
     }
@@ -69,6 +84,7 @@ const socketSetup = (server) => {
     if (userId) {
       socketMap.set(userId, socket.id);
       console.log(`User connected: ${userId} with socket-id ${socket.id}`);
+      emitLoggedUsers();
     } else {
       console.log("Invalid User ID");
     }

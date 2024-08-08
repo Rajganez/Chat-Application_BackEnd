@@ -11,6 +11,7 @@ import {
   addRecipientGroup,
   getGroupChats,
   exitGroupChat,
+  getBuddyChatContacts,
 } from "../controllers/ChatsController.js";
 // import { verifyToken } from "../middlewares/verifyToken.js";
 import multer from "multer";
@@ -38,4 +39,5 @@ groupChatRouter.get("/", getGroups);
 groupChatRouter.get("/:groupid", getSelectedGroup);
 groupChatRouter.post("/addrecipient", addRecipientGroup);
 groupChatRouter.post("/getgroupchat", getGroupChats);
+groupChatRouter.post("/getbuddies", getBuddyChatContacts);
 groupChatRouter.post("/exitgroup", exitGroupChat);

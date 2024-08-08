@@ -2,8 +2,8 @@ import { ObjectId } from "mongodb";
 import { db } from "../DB/mongo-db.js";
 import { userCollection } from "./UsersController.js";
 import { mkdirSync, renameSync } from "fs";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 export const chatCollection = db.collection("Messages");
 export const groupChatCollection = db.collection("GroupMessages");
@@ -114,13 +114,15 @@ export const getSenderMsg = async (req, res) => {
 export const uploadFiles = async (req, res) => {
   try {
     const date = Date.now();
-    const fileDir = path.join('uploads/files', date.toString());
+    const fileDir = path.join("uploads/files", date.toString());
     const filename = path.join(fileDir, req.file.originalname);
 
-    fs.mkdirSync(path.join('/tmp', fileDir), { recursive: true });
-    fs.renameSync(req.file.path, path.join('/tmp', filename));
+    fs.mkdirSync(path.join("/tmp", fileDir), { recursive: true });
+    fs.renameSync(req.file.path, path.join("/tmp", filename));
 
-    return res.status(200).json({ filepath: filename, fileType: req.file.mimetype });
+    return res
+      .status(200)
+      .json({ filepath: filename, fileType: req.file.mimetype });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ msg: "Internal Server Error" });
@@ -227,7 +229,7 @@ export const getGroupChats = async (req, res) => {
   }
 };
 
-//---------Get Messages from Group--------------------//
+//------------Leave from the Group--------------------//
 
 export const exitGroupChat = async (req, res) => {
   const { id } = req.body;
@@ -247,5 +249,30 @@ export const exitGroupChat = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+//------------Get Logged user chat buddies-----------------//
+
+export const getBuddyChatContacts = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const objectId = ObjectId.createFromHexString(id);
+    const buddyContacts = await chatCollection
+      .find({ _id: objectId }, { projection: { recipientId: 1 } })
+      .toArray();
+    if (buddyContacts.length > 0) {
+      const fellowBuddies = await userCollection
+        .find(
+          { _id: { $in: buddyContacts.map((buddy) => buddy.recipientId) } },
+          { projection: { nickName: 1, image: 1 } }
+        )
+        .toArray();
+      return res.status(200).json({ fellowBuddies });
+    }
+    return res.status(404).send({ message: "No buddies found" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error", error: error });
   }
 };
