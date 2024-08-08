@@ -41,6 +41,7 @@ const socketSetup = (server) => {
       content: message.content,
       messageType: message.messageType,
     });
+    console.log("Message stored in DB:", createMsg);
 
     if (recipientId) {
       io.to(recipientId).emit("receiveMessage", message);
