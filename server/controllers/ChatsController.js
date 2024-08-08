@@ -255,24 +255,17 @@ export const exitGroupChat = async (req, res) => {
 //------------Get Logged user chat buddies-----------------//
 
 export const getBuddyChatContacts = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.body;
   try {
     const objectId = ObjectId.createFromHexString(id);
-    const buddyContacts = await chatCollection
-      .find({ _id: objectId }, { projection: { recipientId: 1 } })
+    const buddyContacts = await userCollection
+      .find({ _id: objectId })
       .toArray();
-    if (buddyContacts.length > 0) {
-      const fellowBuddies = await userCollection
-        .find(
-          { _id: { $in: buddyContacts.map((buddy) => buddy.recipientId) } },
-          { projection: { nickName: 1, image: 1 } }
-        )
-        .toArray();
-      return res.status(200).json({ fellowBuddies });
-    }
-    return res.status(404).send({ message: "No buddies found" });
+    return res.status(200).json({ buddyContacts });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Server error", error: error });
+    return res
+      .status(404)
+      .json({ message: "Server error or Not Found", error: error });
   }
 };
