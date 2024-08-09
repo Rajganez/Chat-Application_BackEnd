@@ -209,77 +209,6 @@ export const verifyMail = async (req, res) => {
   }
 };
 
-// -------------Add Profile-image Function--------------//
-
-export const buddyDP = async (req, res) => {
-  const { id } = req.params;
-  try {
-    console.log(req.file);
-    const objectId = ObjectId.createFromHexString(id);
-    if (!req.file) {
-      return res.status(404).json({ msg: "Error updating Image" });
-    }
-    const date = Date.now();
-    const fileName = path.join(
-      "uploads/profiles",
-      `${date}-${req.file.originalname}`
-    );
-
-    fs.renameSync(req.file.path, path.join("/tmp", fileName));
-
-    const updatedUser = await userCollection.findOneAndUpdate(
-      { _id: objectId },
-      { $set: { image: fileName } }
-    );
-
-    return res
-      .status(200)
-      .json({ userImage: updatedUser.image, filename: fileName });
-  } catch (error) {
-    console.error(error);
-    if (!res.headersSent) {
-      return res.status(500).send({ error: error.message });
-    }
-  }
-};
-
-// -------------Remove Profile-image Function--------------//
-
-export const removeBuddyDP = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const objectId = ObjectId.createFromHexString(id);
-    const user = await userCollection.findOne({ _id: objectId });
-    const encodedFilePath = user.image
-      .split("/")
-      .map((segment) => encodeURIComponent(segment))
-      .join("/");
-    if (user.image !== null) {
-      const imagePath = path.resolve("/tmp", encodedFilePath);
-      try {
-        await fsPromises.unlink(imagePath);
-        const updatedUser = await userCollection.findOneAndUpdate(
-          { _id: objectId },
-          { $set: { image: null } },
-          { returnDocument: "after" } // Ensure the updated document is returned
-        );
-
-        return res.status(200).json({ userImage: updatedUser.value.image });
-      } catch (unlinkError) {
-        console.error("Error deleting file:", unlinkError);
-        return res
-          .status(500)
-          .send({ msg: "Error deleting file", error: unlinkError.message });
-      }
-    }
-
-    return res.status(400).send({ msg: "No image to delete" });
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).send({ error: error.message });
-  }
-};
-
 // -------------VerifyMail Function--------------//
 
 export const logOut = async (req, res) => {
@@ -422,14 +351,17 @@ export const removeProfile = async (req, res) => {
   try {
     const objectId = ObjectId.createFromHexString(id);
     const user = await userCollection.findOne({ _id: objectId });
-    
+
     if (!user || !user.image) {
       return res.status(404).json({ msg: "User or profile image not found" });
     }
 
     // Extract public ID from the image URL
     const imageUrl = user.image;
-    const publicId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('.'));
+    const publicId = imageUrl.substring(
+      imageUrl.lastIndexOf("/") + 1,
+      imageUrl.lastIndexOf(".")
+    );
 
     cloudinary.config({
       cloud_name: `${process.env.CLOUD_NAME}`,

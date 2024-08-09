@@ -113,26 +113,6 @@ export const getSenderMsg = async (req, res) => {
   }
 };
 
-//---------------Upload files in DB-------------------//
-
-export const uploadFiles = async (req, res) => {
-  try {
-    const date = Date.now();
-    const fileDir = path.join("uploads/files", date.toString());
-    const filename = path.join(fileDir, req.file.originalname);
-
-    fs.mkdirSync(path.join("/tmp", fileDir), { recursive: true });
-    fs.renameSync(req.file.path, path.join("/tmp", filename));
-
-    return res
-      .status(200)
-      .json({ filepath: filename, fileType: req.file.mimetype });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ msg: "Internal Server Error" });
-  }
-};
-
 //------------Get chat of the logged buddy-------------//
 
 export const getChatContact = async (req, res) => {
