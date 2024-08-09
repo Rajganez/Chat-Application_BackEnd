@@ -4,7 +4,6 @@ import {
   getFellowBuddy,
   getSenderMsg,
   searchBuddies,
-  uploadFiles,
   getChatContact,
   getGroups,
   getSelectedGroup,
@@ -27,14 +26,6 @@ chatRoutes.get("/:id", getBuddies);
 chatRoutes.post("/search/:id", searchBuddies);
 chatRoutes.get("/fellow/:id", getFellowBuddy);
 chatRoutes.post("/directmessages", getSenderMsg);
-chatRoutes.post(
-  "/uploadfile",
-  upload.single("file"),
-  uploadFiles,
-  (req, res) => {
-    res.send({ filepath: req.file.path });
-  }
-);
 chatRoutes.post("/getchatcontacts", getChatContact);
 chatRoutes.post("/getbuddies", getBuddyChatContacts);
 chatRoutes.post(
