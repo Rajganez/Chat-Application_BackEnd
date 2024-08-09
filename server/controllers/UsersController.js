@@ -375,6 +375,11 @@ export const uploadProfile = async (req, res) => {
     if (!req.file) {
       return res.status(404).json({ msg: "Error updating Image" });
     }
+    cloudinary.config({
+      cloud_name: `${process.env.CLOUD_NAME}`,
+      api_key: `${process.env.API_KEY}`,
+      api_secret: `${process.env.API_SECRET}`,
+    });
     const date = Date.now();
     const fileExtension = path.extname(req.file.originalname);
     const fileNameWithoutExt = path.basename(
