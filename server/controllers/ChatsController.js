@@ -330,8 +330,13 @@ export const uploadFilesinCloudi = async (req, res) => {
       public_id: fileName,
       folder: "Home/files",
     });
+
+    let optimizeUrl = cloudinary.url(result.public_id, {
+      fetch_format: "auto",
+      quality: "auto",
+    });
     // Remove the query parameter using a regex
-    let optimizeUrl = result.replace(/(\?_a=[^&]*)$/, "");
+    optimizeUrl = optimizeUrl.replace(/(\?_a=[^&]*)$/, "");
     return res.status(200).json({ file: optimizeUrl });
   } catch (error) {
     console.error(error);
