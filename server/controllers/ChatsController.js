@@ -231,7 +231,7 @@ export const getGroupChats = async (req, res) => {
       // Fetch nicknames from userCollection
       const nicknamesData = await userCollection
         .find(
-          { _id: { $in: senderIds.map((id) => ObjectId(id)) } },
+          { _id: { $in: senderIds.map((id) => ObjectId.createFromHexString(id)) } },
           { projection: { nickName: 1 } }
         )
         .toArray();
