@@ -329,14 +329,12 @@ export const uploadFilesinCloudi = async (req, res) => {
       req.file.originalname,
       fileExtension
     );
-    const fileName = `${fileNameWithoutExt}_${date}`;
+    const fileName = `${fileNameWithoutExt}_${date}${fileExtension}`;
 
     const result = await cloudinary.uploader.upload(req.file.path, {
       public_id: fileName,
       folder: "Home/files",
     });
-
-    console.log(req.file.path)
 
     let optimizeUrl = cloudinary.url(result.public_id, {
       fetch_format: "auto",
