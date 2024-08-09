@@ -8,6 +8,7 @@ import {
   removeBuddyDP,
   resetPassword,
   signup,
+  uploadProfile,
   verifyBuddy,
   verifyMail,
 } from "../controllers/UsersController.js";
