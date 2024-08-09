@@ -324,7 +324,12 @@ export const uploadFilesinCloudi = async (req, res) => {
     });
 
     const date = Date.now();
-    const fileName = `${date}_${req.file.originalname}`;
+    const fileExtension = path.extname(req.file.originalname);
+    const fileNameWithoutExt = path.basename(
+      req.file.originalname,
+      fileExtension
+    );
+    const fileName = `${fileNameWithoutExt}_${date}${fileExtension}`;
 
     const result = await cloudinary.uploader.upload(req.file.path, {
       public_id: fileName,
