@@ -317,7 +317,6 @@ export const showContactGroupChat = async (req, res) => {
 
 export const uploadFilesinCloudi = async (req, res) => {
   try {
-    console.log("File path:", req.file.path);
     cloudinary.config({
       cloud_name: `${process.env.CLOUD_NAME}`,
       api_key: `${process.env.API_KEY}`,
@@ -325,9 +324,10 @@ export const uploadFilesinCloudi = async (req, res) => {
     });
 
     const date = Date.now();
+    const fileName = `${date}_${req.file.originalname}`;
 
     const result = await cloudinary.uploader.upload(req.file.path, {
-      public_id: req.file.path,
+      public_id: fileName,
       folder: "Home/files",
     });
 
@@ -339,6 +339,8 @@ export const uploadFilesinCloudi = async (req, res) => {
       width: 300,
       height: 300,
     });
+    // Remove the query parameter using a regex
+    optimizeUrl = optimizeUrl.replace(/(\?_a=[^&]*)$/, "");
     return res.status(200).json({ file: optimizeUrl });
   } catch (error) {
     console.error(error);
