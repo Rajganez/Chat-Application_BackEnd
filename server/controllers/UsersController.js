@@ -414,3 +414,43 @@ export const uploadProfile = async (req, res) => {
     }
   }
 };
+
+//--------------Upload Profile picture in Cloudinary--------------//
+
+export const removeProfile = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const objectId = ObjectId.createFromHexString(id);
+    const user = await userCollection.findOne({ _id: objectId });
+    
+    if (!user || !user.image) {
+      return res.status(404).json({ msg: "User or profile image not found" });
+    }
+
+    // Extract public ID from the image URL
+    const imageUrl = user.image;
+    const publicId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('.'));
+
+    cloudinary.config({
+      cloud_name: `${process.env.CLOUD_NAME}`,
+      api_key: `${process.env.API_KEY}`,
+      api_secret: `${process.env.API_SECRET}`,
+    });
+
+    // Delete the image from Cloudinary
+    await cloudinary.uploader.destroy(`Home/profiles/${publicId}`);
+
+    // Update the user's document to remove the image URL
+    await userCollection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { image: null } }
+    );
+
+    return res.status(200).json({ msg: "Profile image removed successfully" });
+  } catch (error) {
+    console.error(error);
+    if (!res.headersSent) {
+      return res.status(500).send({ error: error.message });
+    }
+  }
+};

@@ -39,6 +39,14 @@ usersRoutes.post(
     res.send({ filename: req.file.path });
   }
 );
+usersRoutes.post(
+  "/remove/:id",
+  upload.single("file"),
+  removeProfile,
+  (req, res) => {
+    res.send({ filename: req.file.path });
+  }
+);
 usersRoutes.delete("/profile/:id/removedp", removeBuddyDP);
 usersRoutes.post("/forgotpassword", forgotPassword);
 usersRoutes.post("/resetpassword/:id", resetPassword);
