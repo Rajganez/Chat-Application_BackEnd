@@ -317,9 +317,10 @@ export const showContactGroupChat = async (req, res) => {
 
 export const uploadFilesinCloudi = async (req, res) => {
   try {
+    console.log('File path:', req.file.path); 
     cloudinary.config({
       cloud_name: `${process.env.CLOUD_NAME}`,
-      api_key: `${process.env.API_KEY}}`,
+      api_key: `${process.env.API_KEY}`,
       api_secret: `${process.env.API_SECRET}`,
     });
 

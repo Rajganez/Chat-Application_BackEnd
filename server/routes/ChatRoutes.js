@@ -37,7 +37,14 @@ chatRoutes.post(
 );
 chatRoutes.post("/getchatcontacts", getChatContact);
 chatRoutes.post("/getbuddies", getBuddyChatContacts);
-chatRoutes.post("/uploadmedia", upload.single("file"), uploadFilesinCloudi);
+chatRoutes.post(
+  "/uploadmedia",
+  upload.single("file"),
+  uploadFilesinCloudi,
+  (req, res) => {
+    res.send({ filepath: req.file.path });
+  }
+);
 
 groupChatRouter.get("/", getGroups);
 groupChatRouter.get("/:groupid", getSelectedGroup);
