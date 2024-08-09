@@ -40,7 +40,7 @@ usersRoutes.post(
     res.send({ filename: req.file.path });
   }
 );
-usersRoutes.post(
+usersRoutes.delete(
   "/remove/:id",
   upload.single("file"),
   removeProfile,
