@@ -11,7 +11,6 @@ import {
   getGroupChats,
   exitGroupChat,
   getBuddyChatContacts,
-  showContactGroupChat,
   uploadFilesinCloudi,
   uploadFiles,
 } from "../controllers/ChatsController.js";
@@ -51,4 +50,3 @@ groupChatRouter.get("/:groupid", getSelectedGroup);
 groupChatRouter.post("/addrecipient", addRecipientGroup);
 groupChatRouter.post("/getgroupchat", getGroupChats);
 groupChatRouter.post("/exitgroup", exitGroupChat);
-groupChatRouter.post("/displaysender", showContactGroupChat);

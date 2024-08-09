@@ -197,6 +197,21 @@ export const getSelectedGroup = async (req, res) => {
 
 //---------Get Messages from Group--------------------//
 
+// export const getGroupChats = async (req, res) => {
+//   const { buddyId, groupid } = req.body;
+//   try {
+//     const chatMsgs = await groupChatCollection.findOne(
+//       { groupId: groupid },
+//       { members: buddyId }
+//     );
+//     if (chatMsgs) {
+//       const getMsg = await chatMsgs.groupContent;
+//       return res.status(200).json({ getMsg });
+//     }
+//   } catch (error) {
+//     res.status(500).send({ msg: "Internal Server Error" });
+//   }
+// };
 export const getGroupChats = async (req, res) => {
   const { buddyId, groupid } = req.body;
   try {
@@ -204,12 +219,46 @@ export const getGroupChats = async (req, res) => {
       { groupId: groupid },
       { members: buddyId }
     );
+
     if (chatMsgs) {
-      const getMsg = await chatMsgs.groupContent;
-      return res.status(200).json({ getMsg });
+      const getMsg = chatMsgs.groupContent;
+
+      // Extract unique sender IDs
+      const senderIds = Array.from(
+        new Set(getMsg.map((msg) => Object.keys(msg)[0]))
+      );
+
+      // Fetch nicknames from userCollection
+      const nicknamesData = await userCollection
+        .find(
+          { _id: { $in: senderIds.map((id) => ObjectId(id)) } },
+          { projection: { nickName: 1 } }
+        )
+        .toArray();
+
+      // Create a map of senderId to nickname
+      const nicknamesMap = {};
+      nicknamesData.forEach((user) => {
+        nicknamesMap[user._id.toString()] = user.nickName;
+      });
+
+      // Attach nicknames to messages
+      const messagesWithNicknames = getMsg.map((msg) => {
+        const senderId = Object.keys(msg)[0];
+        return {
+          senderId,
+          nickname: nicknamesMap[senderId],
+          message: msg[senderId],
+        };
+      });
+
+      return res.status(200).json({ getMsg, nickName: messagesWithNicknames });
+    } else {
+      return res.status(404).send({ msg: "Group not found" });
     }
   } catch (error) {
-    res.status(500).send({ msg: "Internal Server Error" });
+    console.error(error);
+    return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
 
@@ -255,41 +304,6 @@ export const getBuddyChatContacts = async (req, res) => {
     return res
       .status(404)
       .json({ message: "Server error or Not Found", error: error });
-  }
-};
-
-//------------Show contact for Group Chat-----------------//
-
-export const showContactGroupChat = async (req, res) => {
-  const { groupId } = req.body;
-  try {
-    const objectId = ObjectId.createFromHexString(groupId);
-    // Fetch the group content from the database
-    const groupMsg = await groupChatCollection.findOne({ _id: objectId });
-
-    // Fetch user data for the extracted IDs
-    const users = await userCollection
-      .find({ _id: { $in: groupMsg.groupContent.map((id) => ObjectId(id)) } })
-      .toArray();
-
-    // Create a map of user IDs to nicknames
-    const userMap = users.reduce((map, user) => {
-      map[user._id.toString()] = user.nickName;
-      return map;
-    }, {});
-
-    // Replace IDs in the group content with corresponding nicknames
-    const modifiedGroupContent = groupMsg.groupContent.map((content) => {
-      const userId = Object.keys(content)[0];
-      const message = content[userId];
-      return { [userMap[userId] || userId]: message };
-    });
-
-    // Send the modified group content as a JSON response
-    return res.status(200).json({ modifiedGroupContent });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
 
