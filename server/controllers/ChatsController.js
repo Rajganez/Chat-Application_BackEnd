@@ -331,7 +331,7 @@ export const uploadFilesinCloudi = async (req, res) => {
       folder: "Home/files",
     });
 
-    const optimizeUrl = cloudinary.url(result.public_id, {
+    let optimizeUrl = cloudinary.url(result.public_id, {
       fetch_format: "auto",
       quality: "auto",
       crop: "auto",
