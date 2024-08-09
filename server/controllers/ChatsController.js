@@ -329,7 +329,7 @@ export const uploadFilesinCloudi = async (req, res) => {
       req.file.originalname,
       fileExtension
     );
-    const fileName = `${fileNameWithoutExt}_${date}${fileExtension}`;
+    const fileName = `${fileNameWithoutExt}_${date}`;
 
     const result = await cloudinary.uploader.upload(req.file.path, {
       public_id: fileName,
@@ -342,7 +342,7 @@ export const uploadFilesinCloudi = async (req, res) => {
     });
     // Remove the query parameter using a regex
     optimizeUrl = optimizeUrl.replace(/(\?_a=[^&]*)$/, "");
-    return res.status(200).json({ file: optimizeUrl });
+    return res.status(200).json({ file: `${optimizeUrl}${fileExtension}` });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ msg: "Internal Server Error" });
