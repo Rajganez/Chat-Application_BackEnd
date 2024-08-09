@@ -365,3 +365,46 @@ export const resetPassword = async (req, res) => {
     return res.status(500).send({ msg: "Error: " + error.message });
   }
 };
+
+//--------------Upload Profile picture in Cloudinary--------------//
+
+export const uploadProfile = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const objectId = ObjectId.createFromHexString(id);
+    if (!req.file) {
+      return res.status(404).json({ msg: "Error updating Image" });
+    }
+    const date = Date.now();
+    const fileExtension = path.extname(req.file.originalname);
+    const fileNameWithoutExt = path.basename(
+      req.file.originalname,
+      fileExtension
+    );
+    const fileName = `${fileNameWithoutExt}_${date}`;
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      public_id: fileName,
+      folder: "Home/profiles",
+    });
+
+    let optimizeUrl = cloudinary.url(result.public_id, {
+      fetch_format: "auto",
+      quality: "auto",
+      crop: "auto",
+      gravity: "auto",
+    });
+    // Remove the query parameter using a regex
+    optimizeUrl = optimizeUrl.replace(/(\?_a=[^&]*)$/, "");
+    await userCollection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { image: `${optimizeUrl}${fileExtension}` } }
+    );
+    return res.status(200).json({ file: `${optimizeUrl}${fileExtension}` });
+  } catch (error) {
+    console.error(error);
+    if (!res.headersSent) {
+      return res.status(500).send({ error: error.message });
+    }
+  }
+};
