@@ -13,6 +13,7 @@ import {
   getBuddyChatContacts,
   showContactGroupChat,
   uploadFilesinCloudi,
+  uploadFiles,
 } from "../controllers/ChatsController.js";
 // import { verifyToken } from "../middlewares/verifyToken.js";
 import multer from "multer";
@@ -32,6 +33,14 @@ chatRoutes.post(
   "/uploadmedia",
   upload.single("file"),
   uploadFilesinCloudi,
+  (req, res) => {
+    res.send({ filepath: req.file.path });
+  }
+);
+chatRoutes.post(
+  "/uploadfile",
+  upload.single("file"),
+  uploadFiles,
   (req, res) => {
     res.send({ filepath: req.file.path });
   }
