@@ -8,6 +8,7 @@ import { renameSync, unlinkSync } from "fs";
 import { promises as fsPromises } from "fs";
 import fs from "fs";
 import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
 
