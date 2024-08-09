@@ -4,6 +4,10 @@ import { userCollection } from "./UsersController.js";
 import { mkdirSync, renameSync } from "fs";
 import fs from "fs";
 import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const chatCollection = db.collection("Messages");
 export const groupChatCollection = db.collection("GroupMessages");
@@ -271,5 +275,73 @@ export const getBuddyChatContacts = async (req, res) => {
     return res
       .status(404)
       .json({ message: "Server error or Not Found", error: error });
+  }
+};
+
+//------------Show contact for Group Chat-----------------//
+
+export const showContactGroupChat = async (req, res) => {
+  const { groupId } = req.body;
+  try {
+    const objectId = ObjectId.createFromHexString(groupId);
+    // Fetch the group content from the database
+    const groupMsg = await groupChatCollection.findOne({ _id: objectId });
+
+    // Fetch user data for the extracted IDs
+    const users = await userCollection
+      .find({ _id: { $in: groupMsg.groupContent.map((id) => ObjectId(id)) } })
+      .toArray();
+
+    // Create a map of user IDs to nicknames
+    const userMap = users.reduce((map, user) => {
+      map[user._id.toString()] = user.nickName;
+      return map;
+    }, {});
+
+    // Replace IDs in the group content with corresponding nicknames
+    const modifiedGroupContent = groupMsg.groupContent.map((content) => {
+      const userId = Object.keys(content)[0];
+      const message = content[userId];
+      return { [userMap[userId] || userId]: message };
+    });
+
+    // Send the modified group content as a JSON response
+    return res.status(200).json({ modifiedGroupContent });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ msg: "Internal Server Error" });
+  }
+};
+
+//---------------Upload files in Cloudinary-------------------//
+
+export const uploadFilesinCloudi = async (req, res) => {
+  try {
+    cloudinary.config({
+      cloud_name: `${process.env.CLOUD_NAME}`,
+      api_key: `${process.env.API_KEY}}`,
+      api_secret: `${process.env.API_SECRET}`,
+    });
+
+    const date = Date.now();
+    const fileName = `${req.file.originalname}-${date}`;
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      public_id: fileName,
+      folder: "Home/files",
+    });
+
+    const optimizeUrl = cloudinary.url(result.public_id, {
+      fetch_format: "auto",
+      quality: "auto",
+      crop: "auto",
+      gravity: "auto",
+      width: 300,
+      height: 300,
+    });
+    return res.status(200).json({ file: optimizeUrl });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ msg: "Internal Server Error" });
   }
 };

@@ -12,6 +12,8 @@ import {
   getGroupChats,
   exitGroupChat,
   getBuddyChatContacts,
+  showContactGroupChat,
+  uploadFilesinCloudi,
 } from "../controllers/ChatsController.js";
 // import { verifyToken } from "../middlewares/verifyToken.js";
 import multer from "multer";
@@ -35,9 +37,11 @@ chatRoutes.post(
 );
 chatRoutes.post("/getchatcontacts", getChatContact);
 chatRoutes.post("/getbuddies", getBuddyChatContacts);
+chatRoutes.post("/uploadmedia", upload.single("file"), uploadFilesinCloudi);
 
 groupChatRouter.get("/", getGroups);
 groupChatRouter.get("/:groupid", getSelectedGroup);
 groupChatRouter.post("/addrecipient", addRecipientGroup);
 groupChatRouter.post("/getgroupchat", getGroupChats);
 groupChatRouter.post("/exitgroup", exitGroupChat);
+groupChatRouter.post("/displaysender", showContactGroupChat);

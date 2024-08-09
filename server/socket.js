@@ -71,7 +71,7 @@ const socketSetup = (server) => {
         if (socketIds) {
           io.to(socketIds).emit("receiveGroupMessage", message);
         }
-        io.to(socketIds).emit("notification", {
+        io.to(socketIds).emit("groupNotification", {
           groupid: `${groupID}`,
           messageFrom: `${message.sender}`,
         });
