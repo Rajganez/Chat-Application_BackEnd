@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 import { db } from "../DB/mongo-db.js";
 import { userCollection } from "./UsersController.js";
-import { mkdirSync, renameSync } from "fs";
 import fs from "fs";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
@@ -9,7 +8,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+//Collection for Direct Messages
 export const chatCollection = db.collection("Messages");
+
+//Collection for Group/Channel Messages
 export const groupChatCollection = db.collection("GroupMessages");
 
 //----------------Get Logged Buddy Details from the DB-----------//
@@ -17,7 +19,9 @@ export const groupChatCollection = db.collection("GroupMessages");
 export const getBuddies = async (req, res) => {
   const { id } = req.params;
   try {
+    //used to create an ObjectId instance from a hexadecimal string.
     const objectId = ObjectId.createFromHexString(id);
+    //find the user in the database using the ObjectId instance.
     const user = await userCollection.findOne(
       { _id: objectId },
       { projection: { signUpEmail: 0 } }
@@ -33,6 +37,7 @@ export const getBuddies = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).send({ msg: "Error", err: error });
   }
 };
 
@@ -43,9 +48,12 @@ export const searchBuddies = async (req, res) => {
   const { id } = req.params;
   try {
     const objectId = ObjectId.createFromHexString(id);
+    // Check if the searchBuddy parameter is provided
     if (searchBuddy === undefined || searchBuddy === null) {
+      // Return a 400 Bad Request response if searchBuddy is empty
       return res.status(400).send({ msg: "Buddy nickname can't be empty." });
     }
+    // Query the userCollection to find users with nickName or firstName matching the searchBuddy
     const users = await userCollection
       .find(
         {
@@ -73,7 +81,9 @@ export const searchBuddies = async (req, res) => {
 export const getFellowBuddy = async (req, res) => {
   const { id } = req.params;
   try {
+    //Used to create an ObjectId instance from a hexadecimal string.
     const objectId = ObjectId.createFromHexString(id);
+    //Query to find the recipient from the search
     const buddy = await userCollection.findOne({ _id: objectId });
     if (!buddy) {
       return res.status(404).send({ msg: "Buddy not found" });
@@ -92,7 +102,11 @@ export const getFellowBuddy = async (req, res) => {
 export const getSenderMsg = async (req, res) => {
   const { buddyId, fellowId } = req.body;
   try {
-    const newChat = await chatCollection.findOne({ senderId: buddyId });
+    //If Either message sender is buddy/Logged or fellow/Recipient
+    const newChat = await chatCollection.findOne({
+      $or: [{ senderId: buddyId }, { senderId: fellowId }],
+    });
+    //Query to get the DM of the logged and selected recipient
     if (newChat) {
       const messages = await chatCollection
         .find({
@@ -141,6 +155,7 @@ export const getChatContact = async (req, res) => {
 export const addRecipientGroup = async (req, res) => {
   const { recipientId, groupid } = req.body;
   try {
+    //For Channels Message Query to add member in the group
     const getOldMember = await groupChatCollection.findOne(
       { groupId: groupid },
       { members: recipientId }
@@ -168,6 +183,7 @@ export const addRecipientGroup = async (req, res) => {
 
 export const getGroups = async (req, res) => {
   try {
+    //Query to get the default groups from the database
     const groups = await groupChatCollection.find({}).toArray();
     if (groups.length > 0) {
       return res.status(200).json({ groups });
@@ -184,6 +200,7 @@ export const getGroups = async (req, res) => {
 export const getSelectedGroup = async (req, res) => {
   const { groupid } = req.params;
   try {
+    //Query to get the selected group from the database by the user
     const group = await groupChatCollection.findOne({ groupId: groupid });
     if (group) {
       return res.status(200).json({ group });
@@ -197,21 +214,6 @@ export const getSelectedGroup = async (req, res) => {
 
 //---------Get Messages from Group--------------------//
 
-// export const getGroupChats = async (req, res) => {
-//   const { buddyId, groupid } = req.body;
-//   try {
-//     const chatMsgs = await groupChatCollection.findOne(
-//       { groupId: groupid },
-//       { members: buddyId }
-//     );
-//     if (chatMsgs) {
-//       const getMsg = await chatMsgs.groupContent;
-//       return res.status(200).json({ getMsg });
-//     }
-//   } catch (error) {
-//     res.status(500).send({ msg: "Internal Server Error" });
-//   }
-// };
 export const getGroupChats = async (req, res) => {
   const { buddyId, groupid } = req.body;
   try {
@@ -219,29 +221,28 @@ export const getGroupChats = async (req, res) => {
       { groupId: groupid },
       { members: buddyId }
     );
-
     if (chatMsgs) {
       const getMsg = chatMsgs.groupContent;
-
       // Extract unique sender IDs
       const senderIds = Array.from(
         new Set(getMsg.map((msg) => Object.keys(msg)[0]))
       );
-
       // Fetch nicknames from userCollection
       const nicknamesData = await userCollection
         .find(
-          { _id: { $in: senderIds.map((id) => ObjectId.createFromHexString(id)) } },
+          {
+            _id: {
+              $in: senderIds.map((id) => ObjectId.createFromHexString(id)),
+            },
+          },
           { projection: { nickName: 1 } }
         )
         .toArray();
-
       // Create a map of senderId to nickname
       const nicknamesMap = {};
       nicknamesData.forEach((user) => {
         nicknamesMap[user._id.toString()] = user.nickName;
       });
-
       // Attach nicknames to messages
       const messagesWithNicknames = getMsg.map((msg) => {
         const senderId = Object.keys(msg)[0];
@@ -251,7 +252,6 @@ export const getGroupChats = async (req, res) => {
           message: msg[senderId],
         };
       });
-
       return res.status(200).json({ getMsg, nickName: messagesWithNicknames });
     } else {
       return res.status(404).send({ msg: "Group not found" });
@@ -267,11 +267,14 @@ export const getGroupChats = async (req, res) => {
 export const exitGroupChat = async (req, res) => {
   const { id } = req.body;
   try {
+    //Find User is the member of the group
     const group = await groupChatCollection.findOne({ members: id });
     if (group) {
+      //Remove the user from the members array
       const updatedMembers = group.members.filter(
         (memberId) => memberId !== id
       );
+      //Update the group document in the database with the updated members array
       await groupChatCollection.findOneAndUpdate(
         { _id: group._id },
         { $set: { members: updatedMembers } },
@@ -291,6 +294,7 @@ export const getBuddyChatContacts = async (req, res) => {
   const { id } = req.body;
   try {
     const objectId = ObjectId.createFromHexString(id);
+    //Find the sender of a message,
     const buddyContacts = await userCollection.findOne({ _id: objectId });
     return res.status(200).json({
       [id]: {
@@ -310,14 +314,16 @@ export const getBuddyChatContacts = async (req, res) => {
 //---------------Upload files in DB-------------------//
 
 export const uploadFiles = async (req, res) => {
+  //This API is created only for the Group Message
   try {
     const date = Date.now();
+    //In the Render Directory for unique files Date.now() is added
     const fileDir = path.join("uploads/files", date.toString());
+    //Joined with the filename
     const filename = path.join(fileDir, req.file.originalname);
-
     fs.mkdirSync(path.join("/tmp", fileDir), { recursive: true });
     fs.renameSync(req.file.path, path.join("/tmp", filename));
-
+    //Response generated from the server
     return res
       .status(200)
       .json({ filepath: filename, fileType: req.file.mimetype });
@@ -330,13 +336,15 @@ export const uploadFiles = async (req, res) => {
 //---------------Upload files in Cloudinary-------------------//
 
 export const uploadFilesinCloudi = async (req, res) => {
+  //This API is created only for the Direct Message to expirience the various concepts
   try {
+    //Initialize Cloudinary SDK
     cloudinary.config({
       cloud_name: `${process.env.CLOUD_NAME}`,
       api_key: `${process.env.API_KEY}`,
       api_secret: `${process.env.API_SECRET}`,
     });
-
+    //For Unique Files
     const date = Date.now();
     const fileExtension = path.extname(req.file.originalname);
     const fileNameWithoutExt = path.basename(
@@ -344,17 +352,17 @@ export const uploadFilesinCloudi = async (req, res) => {
       fileExtension
     );
     const fileName = `${fileNameWithoutExt}_${date}`;
-
+    //Cloudinary Upload
     const result = await cloudinary.uploader.upload(req.file.path, {
       public_id: fileName,
       folder: "Home/files",
     });
-
+    //Resultant URL
     let optimizeUrl = cloudinary.url(result.public_id, {
       fetch_format: "auto",
       quality: "auto",
     });
-    // Remove the query parameter using a regex
+    // Remove the query parameter using a regex to handle it in the frontend
     optimizeUrl = optimizeUrl.replace(/(\?_a=[^&]*)$/, "");
     return res.status(200).json({ file: `${optimizeUrl}${fileExtension}` });
   } catch (error) {

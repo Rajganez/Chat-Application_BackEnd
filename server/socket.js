@@ -3,8 +3,8 @@ import {
   chatCollection,
   groupChatCollection,
 } from "./controllers/ChatsController.js";
-import { userCollection } from "./controllers/UsersController.js";
 
+//Socket Server configuration
 const socketSetup = (server) => {
   const io = new Server(server, {
     cors: {
@@ -16,11 +16,13 @@ const socketSetup = (server) => {
 
   const socketMap = new Map();
 
+  //Emits the logged User in the socketMap
   const emitLoggedUsers = () => {
     const loggedUsers = Array.from(socketMap.keys());
     io.emit("loggedUsers", loggedUsers);
   };
 
+  //Disconnect the socket server
   const disconnect = (socket) => {
     console.log("disconnected', socket: " + socket.id);
     for (const [userId, socketid] of socketMap.entries()) {
@@ -31,10 +33,12 @@ const socketSetup = (server) => {
     }
     emitLoggedUsers();
   };
+  //Send Direct Message and stored message in the DB - DM functionality
   const sendMsg = async (message) => {
     const senderId = socketMap.get(message.sender);
     const recipientId = socketMap.get(message.recipient);
-    const createMsg = await chatCollection.insertOne({
+    //Inserts Each Message into the DB
+    await chatCollection.insertOne({
       senderId: message.sender,
       recipientId: message.recipient,
       timestamp: Date.now(),
@@ -53,8 +57,10 @@ const socketSetup = (server) => {
     }
   };
 
+  //Send Group Message and stored message in the DB  - Group Chat functionality
   const sendGroupMsg = async (message) => {
     const { sender, groupID } = message;
+    //Inserts Each Message into already exisisting groups in the DB
     const createGroupChats = await groupChatCollection.findOneAndUpdate(
       {
         $and: [{ groupId: groupID }, { members: sender }],
@@ -79,6 +85,7 @@ const socketSetup = (server) => {
     }
   };
 
+  //Socket Connection
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
     if (userId) {
@@ -88,6 +95,7 @@ const socketSetup = (server) => {
     } else {
       console.log("Invalid User ID");
     }
+    //Event Listeners for sending messages and group messages
     socket.on("sendMessage", sendMsg);
     socket.on("sendGroupMessage", sendGroupMsg);
     socket.on("disconnect", () => disconnect(socket));
