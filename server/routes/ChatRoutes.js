@@ -14,7 +14,7 @@ import {
   uploadFilesinCloudi,
   uploadFiles,
 } from "../controllers/ChatsController.js";
-// import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/verifyToken.js";
 import multer from "multer";
 
 //Express Router for chatCollection
@@ -29,7 +29,7 @@ const upload = multer({ dest: "/tmp/uploads/files" });
 chatRoutes.get("/:id", getBuddies);
 chatRoutes.post("/search/:id", searchBuddies);
 chatRoutes.get("/fellow/:id", getFellowBuddy);
-chatRoutes.post("/directmessages", getSenderMsg);
+chatRoutes.post("/directmessages",verifyToken, getSenderMsg);
 chatRoutes.post("/getchatcontacts", getChatContact);
 chatRoutes.post("/getbuddies", getBuddyChatContacts);
 //API endpoints for direct messages for media upload

@@ -12,7 +12,7 @@ import {
   verifyMail,
 } from "../controllers/UsersController.js";
 import multer from "multer";
-// import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/verifyToken.js";
 
 //Express Router for the userCollection/UsersController
 const usersRoutes = Router();
@@ -20,10 +20,10 @@ const usersRoutes = Router();
 //Middleware to store the media files in the server side
 const upload = multer({ dest: "/tmp/uploads/profiles" });
 
-usersRoutes.post("/signup", signup);
-usersRoutes.get("/buddyverify/:id", verifyBuddy);
-usersRoutes.post("/login", loginBuddy);
-usersRoutes.post("/profile/:id", buddyProfile);
+usersRoutes.post("/signup",verifyToken, signup);
+usersRoutes.get("/buddyverify/:id",verifyToken, verifyBuddy);
+usersRoutes.post("/login",verifyToken, loginBuddy);
+usersRoutes.post("/profile/:id",verifyToken, buddyProfile);
 //This API is for profile picture upload
 usersRoutes.post(
   "/upload/:id",
