@@ -36,7 +36,7 @@ await connectToDB();
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://hibuddychatapp.netlify.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
