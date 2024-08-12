@@ -396,7 +396,8 @@ export const notifyMsg = async (req, res) => {
       //If yes, return the sender details along with the sender details
       if (findDM.length > 0) {
         const senderid = findDM.map((ids) => ids.senderId);
-        const uniqueSender = [...new Set(senderid)];
+        const updatedMembers = senderid.filter((Id) => Id !== id);
+        const uniqueSender = [...new Set(updatedMembers)];
         const sender = await userCollection
           .find(
             {
