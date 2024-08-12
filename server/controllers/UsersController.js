@@ -230,7 +230,15 @@ export const verifyMail = async (req, res) => {
 // -------------LogOut Function--------------//
 
 export const logOut = async (req, res) => {
+  const { id } = req.body;
   try {
+    const objectId = ObjectId.createFromHexString(id);
+    //Find the User in the DB and set the logout timestamp
+    const date = Date.now();
+    await userCollection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: { logoutTime: date } }
+    );
     //Clearing the JWT Token for Logout
     res.clearCookie("jwt", {
       secure: true,

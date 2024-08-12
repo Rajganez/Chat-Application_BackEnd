@@ -13,6 +13,7 @@ import {
   getBuddyChatContacts,
   uploadFilesinCloudi,
   uploadFiles,
+  notifyMsg,
 } from "../controllers/ChatsController.js";
 // import { verifyToken } from "../middlewares/verifyToken.js";
 import multer from "multer";
@@ -50,6 +51,8 @@ chatRoutes.post(
     res.send({ filepath: req.file.path });
   }
 );
+chatRoutes.post("/notifymsg", notifyMsg);
+
 //API Endpoints for Group chats
 groupChatRouter.get("/", getGroups);
 groupChatRouter.get("/:groupid", getSelectedGroup);

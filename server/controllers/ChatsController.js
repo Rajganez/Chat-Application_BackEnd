@@ -370,3 +370,49 @@ export const uploadFilesinCloudi = async (req, res) => {
     return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
+
+//---------------Notification when User log's in-----------------//
+
+export const notifyMsg = async (req, res) => {
+  const { id } = req.body;
+  try {
+    const objectId = ObjectId.createFromHexString(id);
+    //Get the log out time of the user
+    const user = await userCollection.findOne(
+      { _id: objectId },
+      { projection: { logoutTime: 1 } }
+    );
+    //In chat collection, find if the user had received message after the logout time
+    if (user) {
+      const findDM = await chatCollection
+        .find(
+          {
+            recipientId: id,
+            $and: [{ timestamp: { $gt: user.logoutTime } }],
+          },
+          { projection: { senderId: 1 } }
+        )
+        .toArray();
+      //If yes, return the sender details along with the sender details
+      if (findDM.length > 0) {
+        const senderid = findDM.map((ids) => ids.senderId);
+        const uniqueSender = [...new Set(senderid)];
+        const sender = await userCollection
+          .find(
+            {
+              _id: {
+                $in: uniqueSender.map((id) => ObjectId.createFromHexString(id)),
+              },
+            },
+            { projection: { nickName: 1, image: 1, _id: 1 } }
+          )
+          .toArray();
+        return res.status(201).json({ sender });
+      }
+    }
+    return res.status(404).send({ msg: "No New Message" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ msg: "Internal Server Error" });
+  }
+};
