@@ -23,7 +23,7 @@ const createToken = (email, userId) => {
 };
 const cookieOptions = {
   httpOnly: true,
-  secure: true,
+  secure: "production",
   sameSite: "None",
   expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
   // enable it when your development in production
