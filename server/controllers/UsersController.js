@@ -21,7 +21,12 @@ const createToken = (email, userId) => {
     expiresIn: "3d",
   });
 };
-
+const cookieOptions = {
+  expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+  httpOnly: true,
+  secure: true, // enable it when your development in production
+  // sameSite: true, // enable it when your development in production
+};
 // -------------Sign Up Function--------------//
 
 export const signup = async (req, res) => {
@@ -68,12 +73,11 @@ export const signup = async (req, res) => {
         <a href=${verifyLink}>${verifyLink}</a>`,
       });
       //Cookie Generated during the SignUp
-      res.cookie("jwt", createToken(userData.signUpEmail, userData._id), {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge,
-      });
+      res.cookie(
+        "jwt",
+        createToken(userData.signUpEmail, userData._id),
+        cookieOptions
+      );
 
       return res.status(201).json({ userToken: token, userId: userData._id });
     });
@@ -129,12 +133,9 @@ export const loginBuddy = async (req, res) => {
     const result = await bcrypt.compare(pass, user.signUpPassword);
     //Login Cookie created for security
     if (result) {
-      res.cookie("jwt", createToken(user.signUpEmail, user._id), {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge,
-      });
+      // Cookie Config
+
+      res.cookie("jwt", createToken(user.signUpEmail, user._id), cookieOptions);
       return res.status(200).json({
         userID: user._id,
         emailVerifed: user.isVerified,
@@ -240,11 +241,7 @@ export const logOut = async (req, res) => {
       { $set: { logoutTime: date } }
     );
     //Clearing the JWT Token for Logout
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
+    res.clearCookie("jwt", cookieOptions);
     return res.status(200).send({ msg: "Buddy Logged Out Successfully" });
   } catch (error) {
     console.log(error);
