@@ -69,10 +69,10 @@ export const signup = async (req, res) => {
       });
       //Cookie Generated during the SignUp
       res.cookie("jwt", createToken(userData.signUpEmail, userData._id), {
-        maxAge,
         httpOnly: true,
         secure: true,
         sameSite: "None",
+        maxAge,
       });
 
       return res.status(201).json({ userToken: token, userId: userData._id });
@@ -130,10 +130,10 @@ export const loginBuddy = async (req, res) => {
     //Login Cookie created for security
     if (result) {
       res.cookie("jwt", createToken(user.signUpEmail, user._id), {
-        maxAge,
         httpOnly: true,
         secure: true,
         sameSite: "None",
+        maxAge,
       });
       return res.status(200).json({
         userID: user._id,
@@ -241,6 +241,7 @@ export const logOut = async (req, res) => {
     );
     //Clearing the JWT Token for Logout
     res.clearCookie("jwt", {
+      httpOnly: true,
       secure: true,
       sameSite: "None",
     });
