@@ -27,7 +27,7 @@ usersRoutes.post("/profile/:id",verifyToken, buddyProfile);
 //This API is for profile picture upload
 usersRoutes.post(
   "/upload/:id",
-  upload.single("file"),
+  upload.single("file"),verifyToken,
   uploadProfile,
   (req, res) => {
     res.send({ filename: req.file.path });

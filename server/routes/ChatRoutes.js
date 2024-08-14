@@ -29,14 +29,14 @@ const upload = multer({ dest: "/tmp/uploads/files" });
 //API endpoints for direct messages
 chatRoutes.get("/:id",verifyToken, getBuddies);
 chatRoutes.post("/search/:id",verifyToken, searchBuddies);
-chatRoutes.get("/fellow/:id", getFellowBuddy);
-chatRoutes.post("/directmessages", getSenderMsg);
-chatRoutes.post("/getchatcontacts", getChatContact);
-chatRoutes.post("/getbuddies", getBuddyChatContacts);
+chatRoutes.get("/fellow/:id",verifyToken, getFellowBuddy);
+chatRoutes.post("/directmessages",verifyToken, getSenderMsg);
+chatRoutes.post("/getchatcontacts",verifyToken, getChatContact);
+chatRoutes.post("/getbuddies",verifyToken, getBuddyChatContacts);
 //API endpoints for direct messages for media upload
 chatRoutes.post(
   "/uploadmedia",
-  upload.single("file"),
+  upload.single("file"),verifyToken,
   uploadFilesinCloudi,
   (req, res) => {
     res.send({ filepath: req.file.path });
@@ -45,17 +45,17 @@ chatRoutes.post(
 //API uploadfile is for the media upload in Groups
 chatRoutes.post(
   "/uploadfile",
-  upload.single("file"),
+  upload.single("file"),verifyToken,
   uploadFiles,
   (req, res) => {
     res.send({ filepath: req.file.path });
   }
 );
-chatRoutes.post("/notifymsg", notifyMsg);
+chatRoutes.post("/notifymsg",verifyToken, notifyMsg);
 
 //API Endpoints for Group chats
-groupChatRouter.get("/", getGroups);
-groupChatRouter.get("/:groupid", getSelectedGroup);
-groupChatRouter.post("/addrecipient", addRecipientGroup);
-groupChatRouter.post("/getgroupchat", getGroupChats);
-groupChatRouter.post("/exitgroup", exitGroupChat);
+groupChatRouter.get("/",verifyToken, getGroups);
+groupChatRouter.get("/:groupid",verifyToken, getSelectedGroup);
+groupChatRouter.post("/addrecipient",verifyToken, addRecipientGroup);
+groupChatRouter.post("/getgroupchat",verifyToken, getGroupChats);
+groupChatRouter.post("/exitgroup",verifyToken, exitGroupChat);
