@@ -71,7 +71,7 @@ export const signup = async (req, res) => {
       res.cookie("jwt", createToken(userData.signUpEmail, userData._id), {
         httpOnly: true,
         secure: true,
-        sameSite: "None",
+        // sameSite: "None",
         maxAge,
       });
 
@@ -132,7 +132,7 @@ export const loginBuddy = async (req, res) => {
       res.cookie("jwt", createToken(user.signUpEmail, user._id), {
         httpOnly: true,
         secure: true,
-        sameSite: "None",
+        // sameSite: "None",
         maxAge,
       });
       return res.status(200).json({
@@ -243,7 +243,7 @@ export const logOut = async (req, res) => {
     res.clearCookie("jwt", {
       httpOnly: true,
       secure: true,
-      sameSite: "None",
+      // sameSite: "None",
     });
     return res.status(200).send({ msg: "Buddy Logged Out Successfully" });
   } catch (error) {

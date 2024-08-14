@@ -36,7 +36,7 @@ usersRoutes.post(
 //To remove the profile picture
 usersRoutes.delete(
   "/remove/:id",
-  upload.single("file"),
+  upload.single("file"),verifyToken,
   removeProfile,
   (req, res) => {
     res.send({ filename: req.file.path });
