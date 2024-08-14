@@ -13,7 +13,7 @@ This project is built using Node.js, Express, MongoDB, Socket.io, Bcrypt, JWT, a
 - [Configuration](#configuration)
 - [Running the Server](#running-the-server)
 - [API Endpoints](#api-endpoints)
-- [Technologies Used](#technologies-used)
+- [Coded with](#coded-with)
 - [Folder Structure](#folder-structure)
 - [Contributing](#contributing)
 - [License](#license)
