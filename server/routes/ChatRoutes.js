@@ -15,7 +15,7 @@ import {
   uploadFiles,
   notifyMsg,
 } from "../controllers/ChatsController.js";
-// import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/verifyToken.js";
 import multer from "multer";
 
 //Express Router for chatCollection
@@ -27,12 +27,12 @@ export const groupChatRouter = Router();
 const upload = multer({ dest: "/tmp/uploads/files" });
 
 //API endpoints for direct messages
-chatRoutes.get("/:id", getBuddies);
-chatRoutes.post("/search/:id", searchBuddies);
-chatRoutes.get("/fellow/:id", getFellowBuddy);
-chatRoutes.post("/directmessages", getSenderMsg);
-chatRoutes.post("/getchatcontacts", getChatContact);
-chatRoutes.post("/getbuddies", getBuddyChatContacts);
+chatRoutes.get("/:id",verifyToken, getBuddies);
+chatRoutes.post("/search/:id",verifyToken, searchBuddies);
+chatRoutes.get("/fellow/:id",verifyToken, getFellowBuddy);
+chatRoutes.post("/directmessages",verifyToken, getSenderMsg);
+chatRoutes.post("/getchatcontacts",verifyToken, getChatContact);
+chatRoutes.post("/getbuddies",verifyToken, getBuddyChatContacts);
 //API endpoints for direct messages for media upload
 chatRoutes.post(
   "/uploadmedia",
@@ -51,11 +51,11 @@ chatRoutes.post(
     res.send({ filepath: req.file.path });
   }
 );
-chatRoutes.post("/notifymsg", notifyMsg);
+chatRoutes.post("/notifymsg",verifyToken, notifyMsg);
 
 //API Endpoints for Group chats
-groupChatRouter.get("/", getGroups);
-groupChatRouter.get("/:groupid", getSelectedGroup);
-groupChatRouter.post("/addrecipient", addRecipientGroup);
-groupChatRouter.post("/getgroupchat", getGroupChats);
-groupChatRouter.post("/exitgroup", exitGroupChat);
+groupChatRouter.get("/",verifyToken, getGroups);
+groupChatRouter.get("/:groupid",verifyToken, getSelectedGroup);
+groupChatRouter.post("/addrecipient",verifyToken, addRecipientGroup);
+groupChatRouter.post("/getgroupchat",verifyToken, getGroupChats);
+groupChatRouter.post("/exitgroup",verifyToken, exitGroupChat);
