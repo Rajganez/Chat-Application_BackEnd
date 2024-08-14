@@ -127,29 +127,6 @@ export const getSenderMsg = async (req, res) => {
   }
 };
 
-//------------Get chat of the logged buddy-------------//
-
-export const getChatContact = async (req, res) => {
-  const { buddyid } = req.body;
-  try {
-    const contact = await chatCollection.findOne({ buddyId: buddyid });
-    if (contact) {
-      const contactInfo = await chatCollection
-        .find(
-          { senderId: { $eq: buddyid } },
-          { recipientId: 1, content: 0, _id: 0, timestamp: 0 }
-        )
-        .toArray();
-      if (contactInfo.length > 0) {
-        return res.status(200).json({ contactInfo });
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({ msg: "Internal Server Error" });
-  }
-};
-
 //------------Add recipient in Groups----------------//
 
 export const addRecipientGroup = async (req, res) => {

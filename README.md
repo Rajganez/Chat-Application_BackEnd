@@ -85,7 +85,7 @@ Chat Routes: (`/chat`)
 
 - `GET /search/:id` : Search contacts of the fellow buddies
 
-- `POST /getchatcontacts` : get chat details of the logged buddy
+- `POST /getbuddies` : get the details of logged buddy
 
 Group Routes: (`/group`)
 
@@ -93,7 +93,7 @@ Group Routes: (`/group`)
 
 - `POST /addrecipient` : Add the logged buddy to the group
 
-## Technologies Used
+## Coded With: 
 
 - Node.js: JavaScript runtime for building the server.
 - Express: Web framework for Node.js to handle routing and middleware.

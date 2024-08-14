@@ -12,9 +12,6 @@ dotenv.config();
 //Collection to store the Users
 export const userCollection = db.collection("Chatters");
 
-//Cookie middleware MaxAge creation
-const maxAge = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-
 //JWT token for Cookie
 const createToken = (email, userId) => {
   return jwt.sign({ mail: email, Id: userId }, process.env.JWT_KEY, {
@@ -26,9 +23,8 @@ const cookieOptions = {
   secure: "production",
   sameSite: "None",
   expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-  // enable it when your development in production
-  // sameSite: true, // enable it when your development in production
 };
+
 // -------------Sign Up Function--------------//
 
 export const signup = async (req, res) => {
@@ -136,7 +132,6 @@ export const loginBuddy = async (req, res) => {
     //Login Cookie created for security
     if (result) {
       // Cookie Config
-
       res.cookie("jwt", createToken(user.signUpEmail, user._id), cookieOptions);
       return res.status(200).json({
         userID: user._id,
