@@ -22,9 +22,11 @@ const createToken = (email, userId) => {
   });
 };
 const cookieOptions = {
-  expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
   httpOnly: true,
-  secure: true, // enable it when your development in production
+  secure: true,
+  sameSite: "None",
+  expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+  // enable it when your development in production
   // sameSite: true, // enable it when your development in production
 };
 // -------------Sign Up Function--------------//
