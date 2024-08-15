@@ -42,9 +42,9 @@ usersRoutes.delete(
     res.send({ filename: req.file.path });
   }
 );
-usersRoutes.post("/forgotpassword",verifyToken, forgotPassword);
-usersRoutes.post("/resetpassword/:id",verifyToken, resetPassword);
-usersRoutes.get("/profile/:id/sendmail",verifyToken, verifyMail);
+usersRoutes.post("/forgotpassword", forgotPassword);
+usersRoutes.post("/resetpassword/:id", resetPassword);
+usersRoutes.get("/profile/:id/sendmail", verifyMail);
 usersRoutes.post("/logout",verifyToken, logOut);
 
 export default usersRoutes;
