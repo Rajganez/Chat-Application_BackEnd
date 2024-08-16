@@ -21,7 +21,7 @@ const usersRoutes = Router();
 const upload = multer({ dest: "/tmp/uploads/profiles" });
 
 usersRoutes.post("/signup", signup);
-usersRoutes.get("/buddyverify/:id",verifyToken, verifyBuddy);
+usersRoutes.get("/buddyverify/:id", verifyBuddy);
 usersRoutes.post("/login", loginBuddy);
 usersRoutes.post("/profile/:id",verifyToken, buddyProfile);
 //This API is for profile picture upload
